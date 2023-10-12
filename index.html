@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2023 DS EU Plenary</title>
+    <script
+      type="module"
+      src="https://js.arcgis.com/calcite-components/1.9.1/calcite.esm.js"
+    ></script>
+    <link rel="stylesheet" type="text/css"
+    href=https://js.arcgis.com/calcite-components/1.9.1/calcite.css />
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.27/esri/themes/light/main.css"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <calcite-shell>
+      <!-- Navigation component -->
+      <calcite-navigation
+        id="primary-navigation"
+        slot="header"
+        navigation-action
+      >
+        <calcite-navigation-logo slot="logo" heading="App Title">
+        </calcite-navigation-logo>
+        <calcite-navigation
+          id="navigation-bookmarks"
+          slot="navigation-secondary"
+        >
+          <calcite-menu
+            slot="content-start"
+            id="calcite-menu-bookmarks-desktop"
+          >
+            <calcite-menu-item
+              breadcrumb
+              text="Navigate to"
+              text-enabled
+            ></calcite-menu-item>
+            <div id="container-bookmarks-desktop"></div>
+          </calcite-menu>
+        </calcite-navigation>
+      </calcite-navigation>
+      <!-- Left panel for desktop -->
+      <calcite-shell-panel
+        slot="panel-start"
+        class="calcite-panel-left-desktop"
+        position="start"
+        id="shell-panel-start"
+        width-scale="m"
+      >
+        <calcite-panel heading="" id="panel-start">
+          <div id="container-features-widget"></div>
+        </calcite-panel>
+      </calcite-shell-panel>
+      <!-- Bottom panel for mobile -->
+      <calcite-shell-panel
+        slot="panel-bottom"
+        class="calcite-panel-bottom-mobile"
+        position="end"
+        id="shell-panel-bottom"
+        layout="horizontal"
+        height-scale="l"
+      >
+        <calcite-panel heading id="panel-bottom"> </calcite-panel>
+      </calcite-shell-panel>
+      <!-- Chip group -->
+      <div class="container-layers-chip-group">
+        <calcite-chip-group
+          id="chip-group-layers"
+          label="chip-group-layers"
+          selection-mode="multiply"
+        >
+        </calcite-chip-group>
+      </div>
+      <!-- map content -->
+      <div style="height: 100%">
+        <div id="viewDiv"></div>
+        <div id="container-value-picker-widget"></div>
+      </div>
+      <!-- Calcite Sheet -->
+      <calcite-sheet label="" id="example-sheet" slot="sheets">
+        <calcite-panel heading="Navigation" id="sheet-panel-bookmarks" closable>
+          <calcite-menu
+            layout="vertical"
+            label="Application menu"
+            id="calcite-menu-bookmarks-mobile"
+          >
+          </calcite-menu>
+        </calcite-panel>
+      </calcite-sheet>
+    </calcite-shell>
+    <script type="module" src="ArcGISMap.js"></script>
+    <script type="module" src="handleResize.js"></script>
+
+    <script></script>
+  </body>
+</html>

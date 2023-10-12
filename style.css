@@ -1,0 +1,61 @@
+calcite-chip[selected] {
+  --calcite-ui-foreground-2: var(--calcite-ui-brand);
+  --calcite-ui-text-1: var(--calcite-ui-text-inverse);
+}
+
+calcite-chip[selected].all {
+  --calcite-ui-foreground-2: #7ec787;
+  --calcite-ui-text-1: var(--calcite-ui-text-inverse);
+}
+
+calcite-chip[selected].male {
+  --calcite-ui-foreground-2: #099fb8;
+  --calcite-ui-text-1: var(--calcite-ui-text-inverse);
+}
+
+calcite-chip[selected].female {
+  --calcite-ui-foreground-2: #f87ba7;
+  --calcite-ui-text-1: var(--calcite-ui-text-inverse);
+}
+#viewDiv {
+  height: 100%;
+}
+
+.container-layers-chip-group {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  position: absolute;
+  top: 10px;
+  z-index: 600; /* CalciteSheet is zIndex 700 */
+  width: 100%;
+}
+
+@media only screen and (max-width: 700px) {
+  .calcite-panel-left-desktop {
+    display: none;
+  }
+  .calcite-shell-panel-desktop {
+    display: none;
+  }
+
+  #navigation-bookmarks {
+    display: none;
+  }
+
+  #container-value-picker-widget {
+    position: absolute;
+    bottom: 20px;
+    right: 50%;
+  }
+}
+@media only screen and (min-width: 700px) {
+  .calcite-panel-bottom-mobile {
+    display: none;
+  }
+  #container-value-picker-widget {
+    position: absolute;
+    bottom: 80px;
+    right: 35%;
+  }
+}
