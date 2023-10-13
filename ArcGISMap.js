@@ -1,6 +1,8 @@
 // @arcgis/core
 import WebMap from "https://js.arcgis.com/4.28/@arcgis/core//WebMap.js";
+import WebScene from "https://js.arcgis.com/4.28/@arcgis/core//WebScene.js";
 import MapView from "https://js.arcgis.com/4.28/@arcgis/core/views/MapView.js";
+import SceneView from "https://js.arcgis.com/4.28/@arcgis/core/views/SceneView.js";
 import Features from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Features.js";
 import * as reactiveUtils from "https://js.arcgis.com/4.28/@arcgis/core/core/reactiveUtils.js";
 import Expand from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Expand.js";
@@ -32,7 +34,7 @@ if (Array.from(urlParams.keys()).includes("webmap_id")) {
 /* Loading a sceneView (3d) */
 if (Array.from(urlParams.keys()).includes("webscene_id")) {
   const itemId = urlParams.get("webscene_id");
-  map = new WebMap({
+  map = new WebScene({
     portalItem: {
       id: itemId,
     },
@@ -72,8 +74,17 @@ map
     // Setting the title of the app
     document.querySelector("calcite-navigation-logo").heading =
       view.map.portalItem.title;
-    renderBookmarksDesktop(view.map.bookmarks, view);
-    renderBookmarksMobile(view.map.bookmarks, view);
+    /* Loading the bookmarks in a 2d map */
+    if (Array.from(urlParams.keys()).includes("webmap_id")) {
+      renderBookmarksDesktop(view.map.bookmarks, view);
+      renderBookmarksMobile(view.map.bookmarks, view);
+    }
+    /* Loading the slides (3d-version of bookmarks) from the 3d scene */
+    if (Array.from(urlParams.keys()).includes("webscene_id")) {
+      renderSlidesDesktop(view.map.presentation.slides, view);
+      renderSlidesMobile(view.map.presentation.slides, view);
+    }
+
     renderChipGroupLayers(view.map.layers);
 
     // Add the widget to the bottom-right corner of the view
@@ -117,7 +128,6 @@ map
     // watch the values change on the value picker update the
     // view.timeExtent show to the land cover for the given year
     valuePickerTime.watch("values", (values) => {
-      console.log(values[0]);
       const startDate = new Date(Date.UTC(values[0], 11, 30, 0, 0, 0)); // One day before
       const endDate = new Date(Date.UTC(values[0] + 1, 0, 1, 0, 0, 0)); // One day later
       view.timeExtent = {
@@ -196,9 +206,50 @@ const renderBookmarksMobile = (bookmarks, mapView) => {
   containerMobile.append(...bookmarkComponentsMobile);
 };
 
+const renderSlidesDesktop = (slides, sceneView) => {
+  const containerDesktop = document.getElementById(
+    "calcite-menu-bookmarks-desktop"
+  );
+  const slidesComponentsDesktop = slides.items.map((slide) => {
+    const slideMenuItem = document.createElement("calcite-menu-item");
+    slideMenuItem.iconStart = "bookmark";
+    slideMenuItem.textEnabled = true;
+    slideMenuItem.text = slide.title.text;
+
+    slideMenuItem.onclick = () => {
+      // In 3d we use camera instead of targetGeometry in 2d
+      sceneView.goTo(slide.viewpoint.camera);
+    };
+
+    return slideMenuItem;
+  });
+  containerDesktop.append(...slidesComponentsDesktop);
+};
+
+const renderSlidesMobile = (slides, sceneView) => {
+  const containerMobile = document.getElementById(
+    "calcite-menu-bookmarks-mobile"
+  );
+  const slidesComponentsMobile = slides.items.map((slide) => {
+    const slideMenuItem = document.createElement("calcite-menu-item");
+    slideMenuItem.iconStart = "bookmark";
+    slideMenuItem.textEnabled = true;
+    slideMenuItem.text = slide.title.text;
+
+    slideMenuItem.onclick = () => {
+      // In 3d we use camera instead of targetGeometry in 2d
+      sceneView.goTo(slide.viewpoint.camera);
+      const sheetComponent = document.querySelector("calcite-sheet");
+      sheetComponent.open = false;
+    };
+
+    return slideMenuItem;
+  });
+  containerMobile.append(...slidesComponentsMobile);
+};
+
 const renderChipGroupLayers = (layers) => {
   const chipsLayers = layers.items.map((layer) => {
-    console.log(layer.visible);
     const chip = document.createElement("calcite-chip");
     chip.id = layer.id;
     chip.value = layer.title;
