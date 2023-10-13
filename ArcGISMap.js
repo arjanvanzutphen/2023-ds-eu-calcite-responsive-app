@@ -30,9 +30,8 @@ if (Array.from(urlParams.keys()).includes("webmap_id")) {
   view = new MapView({
     container: "viewDiv",
   });
-}
+} else if (Array.from(urlParams.keys()).includes("webscene_id")) {
 /* Loading a sceneView (3d) */
-if (Array.from(urlParams.keys()).includes("webscene_id")) {
   const itemId = urlParams.get("webscene_id");
   map = new WebScene({
     portalItem: {
@@ -40,6 +39,15 @@ if (Array.from(urlParams.keys()).includes("webscene_id")) {
     },
   });
   view = new SceneView({
+    container: "viewDiv",
+  });
+} else {
+  map = new WebMap({
+    portalItem: {
+      id: "f7d59aec8487406bb9996d42ec60e277",
+    },
+  });
+  view = new MapView({
     container: "viewDiv",
   });
 }
