@@ -5,11 +5,11 @@ function handleResize() {
   );
 
   /* Move the features widget div from shell panel to bottom panel v.v. */
-  if (width < 700 && containerFeaturesWidget) {
+  if (width < 768 && containerFeaturesWidget) {
     const calcitePanelBottom = document.getElementById("panel-bottom");
     calcitePanelBottom.appendChild(containerFeaturesWidget);
   } else {
-    const calcitePanelLeft = document.getElementById("panel-start");
+    const calcitePanelLeft = document.getElementById("block-features-widget");
     calcitePanelLeft.appendChild(containerFeaturesWidget);
   }
   //
@@ -17,25 +17,33 @@ function handleResize() {
   //
   const calciteNavigationComponent =
     document.querySelector("calcite-navigation");
-  calciteNavigationComponent.navigationAction = width < 700;
+  calciteNavigationComponent.navigationAction = width < 768;
 
   //
-  // Reposition the value picker on resize
+  // Reposition the value picker
   //
   const valuePickerElement = document.getElementById(
     "container-value-picker-widget"
   );
-  const mapElement = document.getElementById("viewDiv");
 
+  //
+  // Reposition the chip group on resize
+  //
+  //const chipGroupElement = document.getElementById("chip-group-layers");
+  const mapElement = document.getElementById("viewDiv");
+  console.log(mapElement.clientWidth);
   valuePickerElement.style.right = `${
-    mapElement.clientWidth / 2 -
-    (valuePickerElement.clientWidth === 0
-      ? 450 / 2
-      : valuePickerElement.clientWidth / 2)
+    mapElement.clientWidth / 2 - valuePickerElement.clientWidth / 2
   }px`;
+
+  // chipGroupElement.style.right = `${
+  //   mapElement.clientWidth / 2 - chipGroupElement.clientWidth / 2
+  // }px`;
 }
 addEventListener("DOMContentLoaded", (event) => {
-  handleResize();
+  setTimeout(() => {
+    handleResize();
+  }, 2000);
 });
 window.addEventListener("resize", handleResize);
 

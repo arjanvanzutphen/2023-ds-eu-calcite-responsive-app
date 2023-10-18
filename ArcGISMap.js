@@ -31,7 +31,7 @@ if (Array.from(urlParams.keys()).includes("webmap_id")) {
     container: "viewDiv",
   });
 } else if (Array.from(urlParams.keys()).includes("webscene_id")) {
-/* Loading a sceneView (3d) */
+  /* Loading a sceneView (3d) */
   const itemId = urlParams.get("webscene_id");
   map = new WebScene({
     portalItem: {
@@ -57,9 +57,14 @@ map
   .then(() => {
     view.map = map;
     view.popupEnabled = false;
-
+    document.title = view?.map?.portalItem?.title;
     document.querySelector("calcite-navigation-logo").heading =
       view?.map?.portalItem?.title;
+    document.getElementById(
+      "container-item-details-img"
+    ).src = `https://www.arcgis.com/sharing/rest/content/items/${view?.map?.portalItem?.id}/info/${view?.map?.portalItem?.thumbnail}`;
+    document.getElementById("container-item-details-description").innerText =
+      view?.map?.portalItem?.snippet;
 
     /* LayerList */
     // const layerListWidget = new LayerList({
@@ -69,8 +74,8 @@ map
     //   content: layerListWidget,
     // });
     // view.ui.add(expandLayerListWidget, "top-right");
-    view.ui.move("zoom", "bottom-right");
-
+    //view.ui.move("zoom", "bottom-right");
+    view.ui.components = ["attribution"];
     const legendWidget = new Legend({
       view: view,
     });
@@ -78,7 +83,7 @@ map
       content: legendWidget,
     });
     view.ui.add(expandLegendWidget, "top-right");
-
+    renderDropdownLayers(view.map.layers);
     // Setting the title of the app
     document.querySelector("calcite-navigation-logo").heading =
       view.map.portalItem.title;
@@ -93,9 +98,7 @@ map
       renderSlidesMobile(view.map.presentation.slides, view);
     }
 
-    renderChipGroupLayers(view.map.layers);
-
-    // Add the widget to the bottom-right corner of the view
+    // renderChipGroupLayers(view.map.layers);
 
     const featuresWidget = new Features({
       container: "container-features-widget",
@@ -114,36 +117,48 @@ map
       },
     });
 
-    const valuePickerTime = new ValuePicker({
-      container: "container-value-picker-widget",
-      component: {
-        // autocasts ValuePickerSlider when type is "slider".
-        type: "slider",
-        min: 2013, // Start value
-        max: 2021, // End value
-        steps: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Thumb snapping locations
-        // minorTicks: [
-        //   2013.5, 2014.5, 2015.5, 2016.5, 2017.5, 2018.5, 2019.5, 2020.5,
-        // ], // Short tick lines
-        majorTicks: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Long tick lines
-        labels: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Long ticks with text
-        // labelFormatFunction: (value) => `${value}%`, // Label definition
-      },
-      values: [2013], // "current value"
-    });
-    view.ui.add(valuePickerTime, "manual");
+    // Add the widget to the bottom-right corner of the view
+    if (Array.from(urlParams.keys()).includes("webmap_id")) {
+      const valuePickerTime = new ValuePicker({
+        container: "container-value-picker-widget",
+        component: {
+          // autocasts ValuePickerSlider when type is "slider".
+          type: "slider",
+          min: 2013, // Start value
+          max: 2021, // End value
+          steps: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Thumb snapping locations
+          // minorTicks: [
+          //   2013.5, 2014.5, 2015.5, 2016.5, 2017.5, 2018.5, 2019.5, 2020.5,
+          // ], // Short tick lines
+          majorTicks: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Long tick lines
+          labels: [2013, 2021], // Long ticks with text
+          // labelFormatFunction: (value) => `${value}%`, // Label definition
+        },
+        visibleElements: {
+          nextButton: false,
+          playButton: true,
+          previousButton: false,
+        },
+        values: [2013], // "current value"
+      });
 
-    // watch the values change on the value picker update the
-    // view.timeExtent show to the land cover for the given year
-    valuePickerTime.watch("values", (values) => {
-      const startDate = new Date(Date.UTC(values[0], 11, 30, 0, 0, 0)); // One day before
-      const endDate = new Date(Date.UTC(values[0] + 1, 0, 1, 0, 0, 0)); // One day later
-      view.timeExtent = {
-        start: startDate,
-        end: endDate,
-      };
-    });
+      view.ui.add(valuePickerTime, "manual");
 
+      // watch the values change on the value picker update the
+      // view.timeExtent show to the land cover for the given year
+      valuePickerTime.watch("values", (values) => {
+        const startDate = new Date(Date.UTC(values[0], 11, 30, 0, 0, 0)); // One day before
+        const endDate = new Date(Date.UTC(values[0] + 1, 0, 1, 0, 0, 0)); // One day later
+        view.timeExtent = {
+          start: startDate,
+          end: endDate,
+        };
+      });
+    }
+
+    //
+    //  EVENTS
+    //
     // Open the Features widget with features fetched from
     // the view click event location.
     reactiveUtils.on(
@@ -169,6 +184,30 @@ map
         }
       }
     );
+
+    // Use reactiveUtils to watch the Features widget features property
+
+    reactiveUtils.watch(
+      () => featuresWidget.features,
+      (features) => {
+        console.log("Features widget features: ", features);
+        document.getElementById("calcite-tip-select-features").style.display =
+          features.length === 0 ? "" : "none";
+      }
+    );
+
+    /**
+     * On change select dropdown layers / metric
+     */
+    const dropdownLayers = document.querySelector(
+      "calcite-dropdown#dropdown-layers"
+    );
+
+    dropdownLayers.calciteDropdownSelect = (evt) => {
+      debugger;
+
+      console.log("dropdownLayers: ", evt);
+    };
   })
   .catch((error) => {
     console.error("Unable to load the map. Error: ", error);
@@ -262,7 +301,6 @@ const renderChipGroupLayers = (layers) => {
     chip.id = layer.id;
     chip.value = layer.title;
     chip.classList = [layer.id];
-    chip.icon = "layers";
     chip.innerText = layer.title;
     chip.selected = layer.visible;
     // Watch the state of layers' visibility
@@ -284,4 +322,40 @@ const renderChipGroupLayers = (layers) => {
 
   const chipGroupLayers = document.getElementById("chip-group-layers");
   chipGroupLayers.append(...chipsLayers);
+};
+
+const renderDropdownLayers = (layers) => {
+  const dropDownItemLayers = layers.items.map((layer) => {
+    const dropdownItem = document.createElement("calcite-dropdown-item");
+    dropdownItem.id = layer.id;
+    dropdownItem.value = layer.id;
+    dropdownItem.innerText = layer.title;
+    dropdownItem.classList = [layer.id];
+    dropdownItem.selected = layer.visible;
+    // Watch the state of layers' visibility
+    reactiveUtils.watch(
+      () => layer.visible,
+      () => {
+        dropdownItem.selected = layer.visible;
+      }
+    );
+    //
+    dropdownItem.onclick = (evt) => {
+      layers.forEach((layer) => {
+        layer.visible = layer.id === evt.currentTarget.id ? true : false;
+      });
+      // const layer = layers.find((layer) => {
+      //   return layer.id === evt.currentTarget.id;
+      // });
+      // layer.visible = !layer.visible;
+      document.querySelector("calcite-button#button-layers").innerHTML =
+        layer.title;
+    };
+    return dropdownItem;
+  });
+
+  const dropdownElement = document.querySelector(
+    "calcite-dropdown#dropdown-layers"
+  );
+  dropdownElement.append(...dropDownItemLayers);
 };

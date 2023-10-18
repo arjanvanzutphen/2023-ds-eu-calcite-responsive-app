@@ -27,6 +27,29 @@
       >
         <calcite-navigation-logo slot="logo" heading="App Title">
         </calcite-navigation-logo>
+        <calcite-label
+          layout="inline"
+          scale="s"
+          slot="content-end"
+          style="padding: 0px 10px"
+        >
+          Metric:
+
+          <calcite-dropdown
+            scale="s"
+            id="dropdown-layers"
+            calciteDropdownSelect="() => {alert('hoi')}"
+          >
+            <calcite-button
+              id="button-layers"
+              scale="s"
+              slot="trigger"
+              appearance="transparent"
+              icon-end="chevron-down"
+              >Complete population</calcite-button
+            >
+          </calcite-dropdown>
+        </calcite-label>
         <calcite-navigation
           id="navigation-bookmarks"
           slot="navigation-secondary"
@@ -53,7 +76,30 @@
         width-scale="m"
       >
         <calcite-panel heading="" id="panel-start">
-          <div id="container-features-widget"></div>
+          <!-- Item details -->
+          <calcite-block open heading="Item Details">
+            <div id="container-item-details"></div>
+            <img id="container-item-details-img" alt="thumbnail item" />
+            <div id="container-item-details-description"></div>
+          </calcite-block>
+          <!-- Feature details -->
+          <calcite-block
+            id="block-features-widget"
+            open
+            heading="Feature Details"
+            description="Select a location on the map"
+          >
+            <calcite-tip
+              id="calcite-tip-select-features"
+              close-disabled
+              heading=""
+              style="text-align: center"
+            >
+              <calcite-icon icon="select"></calcite-icon>
+              <p>Nothing to show here. Did you select a feature on the map?</p>
+            </calcite-tip>
+            <div id="container-features-widget"></div>
+          </calcite-block>
         </calcite-panel>
       </calcite-shell-panel>
       <!-- Bottom panel for mobile -->
@@ -68,14 +114,16 @@
         <calcite-panel heading id="panel-bottom"> </calcite-panel>
       </calcite-shell-panel>
       <!-- Chip group -->
-      <div class="container-layers-chip-group">
+      <!-- <div class="container-layers-chip-group">
         <calcite-chip-group
           id="chip-group-layers"
           label="chip-group-layers"
           selection-mode="multiply"
+          scale="s"
+          style="display: flex; justify-items: center"
         >
         </calcite-chip-group>
-      </div>
+      </div> -->
       <!-- map content -->
       <div style="height: 100%">
         <div id="viewDiv"></div>

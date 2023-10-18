@@ -21,17 +21,27 @@ calcite-chip[selected].female {
   height: 100%;
 }
 
-.container-layers-chip-group {
+#chip-group-layers {
   display: flex;
   justify-content: center;
   text-align: center;
   position: absolute;
   top: 10px;
   z-index: 600; /* CalciteSheet is zIndex 700 */
-  width: 100%;
 }
 
-@media only screen and (max-width: 700px) {
+#container-value-picker-widget {
+  position: absolute;
+  top: 0;
+}
+
+#container-item-details-description {
+  font-size: var(--calcite-font-size--2);
+  color: var(--calcite-ui-text-3);
+}
+
+/* Mobile */
+@media only screen and (max-width: 768px) {
   .calcite-panel-left-desktop {
     display: none;
   }
@@ -43,19 +53,15 @@ calcite-chip[selected].female {
     display: none;
   }
 
-  #container-value-picker-widget {
-    position: absolute;
-    bottom: 20px;
-    right: 50%;
+  .esri-value-picker.esri-widget.esri-value-picker__layout--horizontal.esri-value-picker__type--slider {
+    min-width: 0px;
+    width: 100%;
   }
 }
-@media only screen and (min-width: 700px) {
+
+/* Desktop */
+@media only screen and (min-width: 768px) {
   .calcite-panel-bottom-mobile {
     display: none;
-  }
-  #container-value-picker-widget {
-    position: absolute;
-    bottom: 80px;
-    right: 35%;
   }
 }
