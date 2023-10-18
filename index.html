@@ -36,11 +36,7 @@
           >
             Metric:
 
-            <calcite-dropdown
-              scale="s"
-              id="dropdown-layers"
-              calciteDropdownSelect="() => {alert('hoi')}"
-            >
+            <calcite-dropdown scale="s" id="dropdown-layers">
               <calcite-button
                 id="button-layers"
                 scale="s"
@@ -96,8 +92,8 @@
           <calcite-block
             id="block-features-widget"
             open
-            heading="Feature Details"
-            description="Select a location on the map"
+            heading="Geometry details"
+            description="More detailed information appears below"
           >
             <calcite-tip
               id="calcite-tip-select-features"
@@ -150,6 +146,7 @@
             id="calcite-menu-bookmarks-mobile"
           >
           </calcite-menu>
+          <div id="container-bookmarks-mobile"></div>
         </calcite-panel>
       </calcite-sheet>
     </calcite-shell>

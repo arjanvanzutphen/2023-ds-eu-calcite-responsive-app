@@ -82,7 +82,7 @@ map
     const expandLegendWidget = new Expand({
       content: legendWidget,
     });
-    view.ui.add(expandLegendWidget, "top-right");
+    view.ui.add(expandLegendWidget, "bottom-right");
     renderDropdownLayers(view.map.layers);
     // Setting the title of the app
     document.querySelector("calcite-navigation-logo").heading =
@@ -236,22 +236,35 @@ const renderBookmarksDesktop = (bookmarks, mapView) => {
 };
 
 const renderBookmarksMobile = (bookmarks, mapView) => {
-  const containerMobile = document.getElementById(
-    "calcite-menu-bookmarks-mobile"
-  );
+  const containerMobile = document.getElementById("container-bookmarks-mobile");
   const bookmarkComponentsMobile = bookmarks.items.map((bookmark) => {
-    const bookmarkMenuItem = document.createElement("calcite-menu-item");
-    bookmarkMenuItem.iconStart = "bookmark";
-    bookmarkMenuItem.textEnabled = true;
-    bookmarkMenuItem.text = bookmark.name;
-
-    bookmarkMenuItem.onclick = () => {
+    const cardItem = document.createElement("calcite-card");
+    cardItem.thumbnailPosition = "inline-start";
+    const img = document.createElement("img");
+    img.slot = "thumbnail";
+    img.src = bookmark.thumbnail.url;
+    cardItem.appendChild(img);
+    const spanTitle = document.createElement("span");
+    spanTitle.slot = "title";
+    spanTitle.innerText = bookmark.name;
+    cardItem.appendChild(spanTitle);
+    const spanSubtitle = document.createElement("span");
+    spanSubtitle.slot = "subtitle";
+    spanSubtitle.innerText = "Move the map to the location of the bookmark";
+    cardItem.appendChild(spanSubtitle);
+    const buttonZoomTo = document.createElement("calcite-button");
+    buttonZoomTo.innerText = `Zoom to ${bookmark.name}`;
+    buttonZoomTo.scale = "s";
+    buttonZoomTo.slot = "footer-end";
+    buttonZoomTo.iconStart = "layer-zoom-to";
+    buttonZoomTo.onclick = () => {
       mapView.goTo(bookmark.viewpoint.targetGeometry);
       const sheetComponent = document.querySelector("calcite-sheet");
       sheetComponent.open = false;
     };
+    cardItem.appendChild(buttonZoomTo);
 
-    return bookmarkMenuItem;
+    return cardItem;
   });
   containerMobile.append(...bookmarkComponentsMobile);
 };
@@ -277,25 +290,39 @@ const renderSlidesDesktop = (slides, sceneView) => {
 };
 
 const renderSlidesMobile = (slides, sceneView) => {
-  const containerMobile = document.getElementById(
-    "calcite-menu-bookmarks-mobile"
-  );
-  const slidesComponentsMobile = slides.items.map((slide) => {
-    const slideMenuItem = document.createElement("calcite-menu-item");
-    slideMenuItem.iconStart = "bookmark";
-    slideMenuItem.textEnabled = true;
-    slideMenuItem.text = slide.title.text;
-
-    slideMenuItem.onclick = () => {
+  const containerMobile = document.getElementById("container-bookmarks-mobile");
+  const slideComponentsMobile = slides.items.map((slide) => {
+    const cardItem = document.createElement("calcite-card");
+    cardItem.thumbnailPosition = "inline-start";
+    const img = document.createElement("img");
+    img.slot = "thumbnail";
+    img.src = slide.thumbnail.url;
+    cardItem.appendChild(img);
+    const spanTitle = document.createElement("span");
+    spanTitle.slot = "title";
+    spanTitle.innerText = slide.title.text;
+    cardItem.appendChild(spanTitle);
+    const spanSubtitle = document.createElement("span");
+    spanSubtitle.slot = "subtitle";
+    spanSubtitle.innerText = "Move the map to the location of the slide";
+    cardItem.appendChild(spanSubtitle);
+    const buttonZoomTo = document.createElement("calcite-button");
+    buttonZoomTo.innerText = `Zoom to ${slide.title.text}`;
+    buttonZoomTo.scale = "s";
+    buttonZoomTo.slot = "footer-end";
+    buttonZoomTo.iconStart = "layer-zoom-to";
+    buttonZoomTo.onclick = () => {
       // In 3d we use camera instead of targetGeometry in 2d
+
       sceneView.goTo(slide.viewpoint.camera);
       const sheetComponent = document.querySelector("calcite-sheet");
       sheetComponent.open = false;
     };
+    cardItem.appendChild(buttonZoomTo);
 
-    return slideMenuItem;
+    return cardItem;
   });
-  containerMobile.append(...slidesComponentsMobile);
+  containerMobile.append(...slideComponentsMobile);
 };
 
 const renderChipGroupLayers = (layers) => {
