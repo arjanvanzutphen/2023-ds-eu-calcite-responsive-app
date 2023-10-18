@@ -64,4 +64,8 @@ calcite-chip[selected].female {
   .calcite-panel-bottom-mobile {
     display: none;
   }
+
+  #navigation-metrics {
+    display: none;
+  }
 }

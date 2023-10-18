@@ -3,14 +3,25 @@ function handleResize() {
   const containerFeaturesWidget = document.getElementById(
     "container-features-widget"
   );
+  const containerDropdownMetrics = document.getElementById(
+    "label-dropdown-layers"
+  );
 
   /* Move the features widget div from shell panel to bottom panel v.v. */
   if (width < 768 && containerFeaturesWidget) {
     const calcitePanelBottom = document.getElementById("panel-bottom");
     calcitePanelBottom.appendChild(containerFeaturesWidget);
+    const containerMetrics = document.getElementById(
+      "container-metrics-mobile"
+    );
+    containerMetrics.appendChild(containerDropdownMetrics);
   } else {
     const calcitePanelLeft = document.getElementById("block-features-widget");
     calcitePanelLeft.appendChild(containerFeaturesWidget);
+    const containerMetrics = document.getElementById(
+      "container-metrics-desktop"
+    );
+    containerMetrics.appendChild(containerDropdownMetrics);
   }
   //
   // Toggle the navigation action in mobile view
@@ -31,7 +42,7 @@ function handleResize() {
   //
   //const chipGroupElement = document.getElementById("chip-group-layers");
   const mapElement = document.getElementById("viewDiv");
-  console.log(mapElement.clientWidth);
+  //console.log(mapElement.clientWidth);
   valuePickerElement.style.right = `${
     mapElement.clientWidth / 2 - valuePickerElement.clientWidth / 2
   }px`;
@@ -57,7 +68,6 @@ navigation?.addEventListener("calciteNavigationActionSelect", function () {
 });
 
 /* Closing the sheet in the panel button */
-const panel = document.getElementById("sheet-panel-bookmarks");
-panel?.addEventListener("calcitePanelClose", function () {
+sheet?.addEventListener("calciteSheetClose", function () {
   sheet.open = false;
 });

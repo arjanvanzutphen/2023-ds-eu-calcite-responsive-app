@@ -27,31 +27,35 @@
       >
         <calcite-navigation-logo slot="logo" heading="App Title">
         </calcite-navigation-logo>
-        <calcite-label
-          layout="inline"
-          scale="s"
-          slot="content-end"
-          style="padding: 0px 10px"
-        >
-          Metric:
-
-          <calcite-dropdown
+        <div id="container-metrics-desktop" slot="content-end">
+          <calcite-label
+            id="label-dropdown-layers"
+            layout="inline"
             scale="s"
-            id="dropdown-layers"
-            calciteDropdownSelect="() => {alert('hoi')}"
+            style="padding: 0px 10px"
           >
-            <calcite-button
-              id="button-layers"
-              scale="s"
-              slot="trigger"
-              appearance="transparent"
-              icon-end="chevron-down"
-              >Complete population</calcite-button
-            >
-            <calcite-dropdown-group selection-mode="single" group-title="Select a metric">
+            Metric:
 
-          </calcite-dropdown>
-        </calcite-label>
+            <calcite-dropdown
+              scale="s"
+              id="dropdown-layers"
+              calciteDropdownSelect="() => {alert('hoi')}"
+            >
+              <calcite-button
+                id="button-layers"
+                scale="s"
+                slot="trigger"
+                appearance="transparent"
+                icon-end="chevron-down"
+                >Complete population</calcite-button
+              >
+              <calcite-dropdown-group
+                selection-mode="single"
+                group-title="Select a metric"
+              />
+            </calcite-dropdown>
+          </calcite-label>
+        </div>
         <calcite-navigation
           id="navigation-bookmarks"
           slot="navigation-secondary"
@@ -68,7 +72,11 @@
             <div id="container-bookmarks-desktop"></div>
           </calcite-menu>
         </calcite-navigation>
+        <calcite-navigation id="navigation-metrics" slot="navigation-secondary">
+          <div id="container-metrics-mobile" slot="content-end"></div>
+        </calcite-navigation>
       </calcite-navigation>
+
       <!-- Left panel for desktop -->
       <calcite-shell-panel
         slot="panel-start"
@@ -98,7 +106,9 @@
               style="text-align: center"
             >
               <calcite-icon icon="select"></calcite-icon>
-              <p>Nothing to show here. Why don't you select something on the map?</p>
+              <p>
+                Nothing to show here. Why don't you select something on the map?
+              </p>
             </calcite-tip>
             <div id="container-features-widget"></div>
           </calcite-block>
@@ -133,7 +143,7 @@
       </div>
       <!-- Calcite Sheet -->
       <calcite-sheet label="" id="example-sheet" slot="sheets">
-        <calcite-panel heading="Navigation" id="sheet-panel-bookmarks" closable>
+        <calcite-panel heading="Select a location" id="sheet-panel-bookmarks">
           <calcite-menu
             layout="vertical"
             label="Application menu"
