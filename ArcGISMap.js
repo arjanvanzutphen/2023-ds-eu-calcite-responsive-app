@@ -60,11 +60,11 @@ map
     document.title = view?.map?.portalItem?.title;
     document.querySelector("calcite-navigation-logo").heading =
       view?.map?.portalItem?.title;
-    document.getElementById(
-      "container-item-details-img"
-    ).src = `https://www.arcgis.com/sharing/rest/content/items/${view?.map?.portalItem?.id}/info/${view?.map?.portalItem?.thumbnail}`;
-    document.getElementById("container-item-details-description").innerText =
-      view?.map?.portalItem?.snippet;
+    // document.getElementById(
+    //   "container-item-details-img"
+    // ).src = `https://www.arcgis.com/sharing/rest/content/items/${view?.map?.portalItem?.id}/info/${view?.map?.portalItem?.thumbnail}`;
+    // document.getElementById("container-item-details-description").innerText =
+    //   view?.map?.portalItem?.snippet;
 
     /* LayerList */
     // const layerListWidget = new LayerList({
@@ -114,6 +114,9 @@ map
           },
         ],
         view: view,
+      },
+      visibleElements: {
+        closeButton: false,
       },
     });
 
