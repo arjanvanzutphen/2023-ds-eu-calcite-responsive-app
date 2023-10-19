@@ -3,6 +3,8 @@ import WebMap from "https://js.arcgis.com/4.28/@arcgis/core//WebMap.js";
 import WebScene from "https://js.arcgis.com/4.28/@arcgis/core//WebScene.js";
 import MapView from "https://js.arcgis.com/4.28/@arcgis/core/views/MapView.js";
 import SceneView from "https://js.arcgis.com/4.28/@arcgis/core/views/SceneView.js";
+import FeatureEffect from "https://js.arcgis.com/4.28/@arcgis/core/layers/support/FeatureEffect.js";
+import FeatureFilter from "https://js.arcgis.com/4.28/@arcgis/core/layers/support/FeatureFilter.js";
 import Features from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Features.js";
 import * as reactiveUtils from "https://js.arcgis.com/4.28/@arcgis/core/core/reactiveUtils.js";
 import Expand from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Expand.js";
@@ -198,6 +200,38 @@ map
           features.length === 0 ? "" : "none";
       }
     );
+
+    // Feature effect
+    if (Array.from(urlParams.keys()).includes("webmap_id")) {
+      reactiveUtils.watch(
+        () => featuresWidget.selectedFeature,
+        (selectedFeature) => {
+          // Typical usage
+          if (selectedFeature) {
+            const effect = new FeatureEffect({
+              filter: new FeatureFilter({
+                where: `${selectedFeature.layer.objectIdField} = ${
+                  selectedFeature.attributes[
+                    selectedFeature.layer.objectIdField
+                  ]
+                }`,
+              }),
+              includedEffect: "drop-shadow(3px, 3px, 3px, black)",
+              excludedEffect: "grayscale(40%) opacity(30%)",
+            });
+            selectedFeature.layer.highlightOptions = undefined;
+            selectedFeature.layer.featureEffect = effect;
+          } else {
+            view.map.allLayers.map((layer) => {
+              layer.featureEffect = undefined;
+            });
+          }
+          // console.log("Features widget features: ", features);
+          // document.getElementById("calcite-tip-select-features").style.display =
+          //   features.length === 0 ? "" : "none";
+        }
+      );
+    }
 
     /**
      * On change select dropdown layers / metric
