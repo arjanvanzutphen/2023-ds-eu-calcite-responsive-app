@@ -27,12 +27,30 @@
       >
         <calcite-navigation-logo slot="logo" heading="App Title">
         </calcite-navigation-logo>
+        <div id="container-2d-3d-desktop" slot="content-center">
+          <!-- 2D / 3D chip group -->
+          <!-- <calcite-chip-group
+            id="chip-group-2d-3d"
+            label="chip-group-2d-3d"
+            selection-mode="single-persist"
+            scale="m"
+            style="padding: 0px 10px"
+          >
+            <calcite-chip id="chip-2d" selected value="2D" icon="analysis"
+              >2D</calcite-chip
+            >
+            <calcite-chip id="chip-3d" value="3D" icon="globe">
+              3D
+            </calcite-chip>
+          </calcite-chip-group> -->
+        </div>
+
         <div id="container-metrics-desktop" slot="content-end">
           <calcite-label
             id="label-dropdown-layers"
             layout="inline"
             scale="s"
-            style="padding: 0px 10px"
+            style="padding: 7px 10px 0px 10px"
           >
             Metric:
 
@@ -68,7 +86,9 @@
             <div id="container-bookmarks-desktop"></div>
           </calcite-menu>
         </calcite-navigation>
+        <!-- 2nd navigation bar for mobile -->
         <calcite-navigation id="navigation-metrics" slot="navigation-secondary">
+          <div id="container-2d-3d-mobile" slot="content-start"></div>
           <div id="container-metrics-mobile" slot="content-end"></div>
         </calcite-navigation>
       </calcite-navigation>
@@ -83,11 +103,18 @@
       >
         <calcite-panel heading="" id="panel-start">
           <!-- Item details -->
-          <!-- <calcite-block open heading="Item Details">
+          <calcite-block id="block-item-details" open heading="Item Details">
             <div id="container-item-details"></div>
             <img id="container-item-details-img" alt="thumbnail item" />
-            <div id="container-item-details-description"></div>
-          </calcite-block> -->
+            <calcite-label>
+              <span>Description</span>
+              <div id="container-item-details-description"></div>
+            </calcite-label>
+            <calcite-label>
+              <span>Owner</span>
+              <div id="container-item-details-owner"></div
+            ></calcite-label>
+          </calcite-block>
           <!-- Feature details -->
           <calcite-block
             id="block-features-widget"
@@ -102,7 +129,7 @@
               style="text-align: center"
             >
               <calcite-icon icon="select"></calcite-icon>
-              <p>
+              <p class="calcite-tip-select-feature">
                 Nothing to show here. Why don't you select something on the map?
               </p>
             </calcite-tip>

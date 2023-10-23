@@ -8,7 +8,6 @@ import FeatureFilter from "https://js.arcgis.com/4.28/@arcgis/core/layers/suppor
 import Features from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Features.js";
 import * as reactiveUtils from "https://js.arcgis.com/4.28/@arcgis/core/core/reactiveUtils.js";
 import Expand from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Expand.js";
-import LayerList from "https://js.arcgis.com/4.28/@arcgis/core/widgets/LayerList.js";
 import Legend from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Legend.js";
 import ValuePicker from "https://js.arcgis.com/4.28/@arcgis/core/widgets/ValuePicker.js";
 
@@ -31,6 +30,11 @@ if (Array.from(urlParams.keys()).includes("webmap_id")) {
   });
   view = new MapView({
     container: "viewDiv",
+    highlightOptions: {
+      color: [255, 255, 0, 0],
+      haloOpacity: 0.9,
+      fillOpacity: 0.2,
+    },
   });
 } else if (Array.from(urlParams.keys()).includes("webscene_id")) {
   /* Loading a sceneView (3d) */
@@ -51,31 +55,35 @@ if (Array.from(urlParams.keys()).includes("webmap_id")) {
   });
   view = new MapView({
     container: "viewDiv",
+    highlightOptions: {
+      color: [255, 255, 0, 0],
+      haloOpacity: 0.9,
+      fillOpacity: 0.2,
+    },
   });
 }
 
 map
   .load()
-  .then(() => {
+  .then(async () => {
     view.map = map;
     view.popupEnabled = false;
+    await view?.map?.portalItem?.portal.load();
+    /* Item title */
     document.title = view?.map?.portalItem?.title;
     document.querySelector("calcite-navigation-logo").heading =
       view?.map?.portalItem?.title;
-    // document.getElementById(
-    //   "container-item-details-img"
-    // ).src = `https://www.arcgis.com/sharing/rest/content/items/${view?.map?.portalItem?.id}/info/${view?.map?.portalItem?.thumbnail}`;
-    // document.getElementById("container-item-details-description").innerText =
-    //   view?.map?.portalItem?.snippet;
+    /* Item thumbnail */
+    document.getElementById(
+      "container-item-details-img"
+    ).src = `https://www.arcgis.com/sharing/rest/content/items/${view?.map?.portalItem?.id}/info/${view?.map?.portalItem?.thumbnail}`;
+    /* Item description */
+    document.getElementById("container-item-details-description").innerText =
+      view?.map?.portalItem?.snippet;
+    /* Item owner */
+    document.getElementById("container-item-details-owner").innerText =
+      view?.map?.portalItem?.owner;
 
-    /* LayerList */
-    // const layerListWidget = new LayerList({
-    //   view: view,
-    // });
-    // const expandLayerListWidget = new Expand({
-    //   content: layerListWidget,
-    // });
-    // view.ui.add(expandLayerListWidget, "top-right");
     //view.ui.move("zoom", "bottom-right");
     view.ui.components = ["attribution"];
     const legendWidget = new Legend({
@@ -110,6 +118,12 @@ map
         actions: [
           {
             type: "button",
+            title: "Clear selection",
+            id: "clear-selection",
+            icon: "clear-selection",
+          },
+          {
+            type: "button",
             title: "More information",
             id: "more-info",
             icon: "information-letter",
@@ -125,35 +139,43 @@ map
     // Add the widget to the bottom-right corner of the view
     if (Array.from(urlParams.keys()).includes("webmap_id")) {
       const valuePickerTime = new ValuePicker({
-        container: "container-value-picker-widget",
+        //container: "container-value-picker-widget",
         component: {
-          // autocasts ValuePickerSlider when type is "slider".
-          type: "slider",
-          min: 2013, // Start value
-          max: 2021, // End value
-          steps: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Thumb snapping locations
-          // minorTicks: [
-          //   2013.5, 2014.5, 2015.5, 2016.5, 2017.5, 2018.5, 2019.5, 2020.5,
-          // ], // Short tick lines
-          majorTicks: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], // Long tick lines
-          labels: [2013, 2021], // Long ticks with text
-          // labelFormatFunction: (value) => `${value}%`, // Label definition
+          type: "label",
+          items: [
+            { value: "2013", label: "2013" },
+            { value: "2014", label: "2014" },
+            { value: "2015", label: "2015" },
+            { value: "2016", label: "2016" },
+            { value: "2017", label: "2017" },
+            { value: "2018", label: "2018" },
+            { value: "2019", label: "2019" },
+            { value: "2020", label: "2020" },
+            { value: "2021", label: "2021" },
+          ],
         },
+        caption: "Year",
+        playRate: 600,
         visibleElements: {
-          nextButton: false,
+          nextButton: true,
           playButton: true,
-          previousButton: false,
+          previousButton: true,
         },
-        values: [2013], // "current value"
+        values: ["2013"], // "current value"
       });
 
-      view.ui.add(valuePickerTime, "manual");
+      view.ui.add(valuePickerTime, "top-left");
 
       // watch the values change on the value picker update the
       // view.timeExtent show to the land cover for the given year
       valuePickerTime.watch("values", (values) => {
-        const startDate = new Date(Date.UTC(values[0], 11, 30, 0, 0, 0)); // One day before
-        const endDate = new Date(Date.UTC(values[0] + 1, 0, 1, 0, 0, 0)); // One day later
+        //console.log(values);
+        const startDate = new Date(
+          Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
+        ); // One day before
+        const endDate = new Date(
+          Date.UTC(Number.parseInt(values[0]) + 1, 0, 1, 0, 0, 0)
+        ); // One day later
         view.timeExtent = {
           start: startDate,
           end: endDate,
@@ -187,6 +209,13 @@ map
         if (event.action.id === "more-info") {
           window.open("https://developers.arcgis.com/javascript");
         }
+        if (event.action.id === "clear-selection") {
+          featuresWidget.features = undefined;
+          featuresWidget.close();
+        }
+
+        //console.log(featuresWidget);
+        //debugger;
       }
     );
 
@@ -221,14 +250,18 @@ map
             });
             selectedFeature.layer.highlightOptions = undefined;
             selectedFeature.layer.featureEffect = effect;
+            // Hide the item details
+            document.querySelector(
+              "calcite-block#block-item-details"
+            ).style.display = "none";
           } else {
             view.map.allLayers.map((layer) => {
               layer.featureEffect = undefined;
             });
+            document.querySelector(
+              "calcite-block#block-item-details"
+            ).style.display = "";
           }
-          // console.log("Features widget features: ", features);
-          // document.getElementById("calcite-tip-select-features").style.display =
-          //   features.length === 0 ? "" : "none";
         }
       );
     }
@@ -236,15 +269,15 @@ map
     /**
      * On change select dropdown layers / metric
      */
-    const dropdownLayers = document.querySelector(
-      "calcite-dropdown#dropdown-layers"
-    );
+    // const dropdownLayers = document.querySelector(
+    //   "calcite-dropdown#dropdown-layers"
+    // );
 
-    dropdownLayers.calciteDropdownSelect = (evt) => {
-      debugger;
+    // dropdownLayers.calciteDropdownSelect = (evt) => {
+    //   debugger;
 
-      console.log("dropdownLayers: ", evt);
-    };
+    //   //console.log("dropdownLayers: ", evt);
+    // };
   })
   .catch((error) => {
     console.error("Unable to load the map. Error: ", error);
@@ -357,35 +390,6 @@ const renderSlidesMobile = (slides, sceneView) => {
     return cardItem;
   });
   containerMobile.append(...slideComponentsMobile);
-};
-
-const renderChipGroupLayers = (layers) => {
-  const chipsLayers = layers.items.map((layer) => {
-    const chip = document.createElement("calcite-chip");
-    chip.id = layer.id;
-    chip.value = layer.title;
-    chip.classList = [layer.id];
-    chip.innerText = layer.title;
-    chip.selected = layer.visible;
-    // Watch the state of layers' visibility
-    reactiveUtils.watch(
-      () => layer.visible,
-      () => {
-        chip.selected = layer.visible;
-      }
-    );
-    //
-    chip.onclick = (evt) => {
-      const layer = layers.find((layer) => {
-        return layer.id === evt.currentTarget.id;
-      });
-      layer.visible = !layer.visible;
-    };
-    return chip;
-  });
-
-  const chipGroupLayers = document.getElementById("chip-group-layers");
-  chipGroupLayers.append(...chipsLayers);
 };
 
 const renderDropdownLayers = (layers) => {

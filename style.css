@@ -40,6 +40,23 @@ calcite-chip[selected].female {
   color: var(--calcite-ui-text-3);
 }
 
+.calcite-tip-select-feature {
+  color: var(--calcite-ui-text-3);
+  font-size: var(--calcite-font-size--2);
+}
+
+.esri-value-picker__layout--horizontal.esri-value-picker__type--label {
+  min-width: 280px;
+  width: 100%;
+}
+
+calcite-label > span {
+  font-weight: 500;
+}
+calcite-label > div {
+  font-size: var(--calcite-font-size--2);
+  color: var(--calcite-ui-text-3);
+}
 /* Mobile */
 @media only screen and (max-width: 768px) {
   .calcite-panel-left-desktop {
@@ -51,11 +68,6 @@ calcite-chip[selected].female {
 
   #navigation-bookmarks {
     display: none;
-  }
-
-  .esri-value-picker.esri-widget.esri-value-picker__layout--horizontal.esri-value-picker__type--slider {
-    min-width: 0px;
-    width: 100%;
   }
 }
 
