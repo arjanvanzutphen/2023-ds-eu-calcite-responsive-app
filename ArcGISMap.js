@@ -271,6 +271,8 @@ map
       },
     });
 
+    const currentYear = "2013";
+
     // Add the widget to the bottom-right corner of the view
     const valuePickerTime = new ValuePicker({
       //container: "container-value-picker-widget",
@@ -289,32 +291,38 @@ map
         ],
       },
       caption: "Year",
-      playRate: 5000,
+      playRate: 600,
       visibleElements: {
         nextButton: true,
         playButton: true,
         previousButton: true,
       },
-      values: ["2013"], // "current value"
+      values: [currentYear], // "current value"
     });
 
     view.ui.add(valuePickerTime, "top-left");
 
-    // watch the values change on the value picker update the
-    // view.timeExtent show to the land cover for the given year
-    valuePickerTime.watch("values", (values) => {
-      //console.log(values);
+    const setCurrentTime = (value) => {
       const startDate = new Date(
-        Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
+        Date.UTC(Number.parseInt(value), 11, 30, 0, 0, 0)
       ); // One day before
       const endDate = new Date(
-        Date.UTC(Number.parseInt(values[0]) + 1, 0, 1, 0, 0, 0)
+        Date.UTC(Number.parseInt(value) + 1, 0, 1, 0, 0, 0)
       ); // One day later
       view.timeExtent = {
         start: startDate,
         end: endDate,
       };
+    }
+
+    // watch the values change on the value picker update the
+    // view.timeExtent show to the land cover for the given year
+    valuePickerTime.watch("values", (values) => {
+      //console.log(values);
+      setCurrentTime(values[0])
     });
+
+    setCurrentTime(currentYear);
 
     //
     //  EVENTS
