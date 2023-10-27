@@ -137,51 +137,49 @@ map
     });
 
     // Add the widget to the bottom-right corner of the view
-    if (Array.from(urlParams.keys()).includes("webmap_id")) {
-      const valuePickerTime = new ValuePicker({
-        //container: "container-value-picker-widget",
-        component: {
-          type: "label",
-          items: [
-            { value: "2013", label: "2013" },
-            { value: "2014", label: "2014" },
-            { value: "2015", label: "2015" },
-            { value: "2016", label: "2016" },
-            { value: "2017", label: "2017" },
-            { value: "2018", label: "2018" },
-            { value: "2019", label: "2019" },
-            { value: "2020", label: "2020" },
-            { value: "2021", label: "2021" },
-          ],
-        },
-        caption: "Year",
-        playRate: 600,
-        visibleElements: {
-          nextButton: true,
-          playButton: true,
-          previousButton: true,
-        },
-        values: ["2013"], // "current value"
-      });
+    const valuePickerTime = new ValuePicker({
+      //container: "container-value-picker-widget",
+      component: {
+        type: "label",
+        items: [
+          { value: "2013", label: "2013" },
+          { value: "2014", label: "2014" },
+          { value: "2015", label: "2015" },
+          { value: "2016", label: "2016" },
+          { value: "2017", label: "2017" },
+          { value: "2018", label: "2018" },
+          { value: "2019", label: "2019" },
+          { value: "2020", label: "2020" },
+          { value: "2021", label: "2021" },
+        ],
+      },
+      caption: "Year",
+      playRate: 5000,
+      visibleElements: {
+        nextButton: true,
+        playButton: true,
+        previousButton: true,
+      },
+      values: ["2013"], // "current value"
+    });
 
-      view.ui.add(valuePickerTime, "top-left");
+    view.ui.add(valuePickerTime, "top-left");
 
-      // watch the values change on the value picker update the
-      // view.timeExtent show to the land cover for the given year
-      valuePickerTime.watch("values", (values) => {
-        //console.log(values);
-        const startDate = new Date(
-          Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
-        ); // One day before
-        const endDate = new Date(
-          Date.UTC(Number.parseInt(values[0]) + 1, 0, 1, 0, 0, 0)
-        ); // One day later
-        view.timeExtent = {
-          start: startDate,
-          end: endDate,
-        };
-      });
-    }
+    // watch the values change on the value picker update the
+    // view.timeExtent show to the land cover for the given year
+    valuePickerTime.watch("values", (values) => {
+      //console.log(values);
+      const startDate = new Date(
+        Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
+      ); // One day before
+      const endDate = new Date(
+        Date.UTC(Number.parseInt(values[0]) + 1, 0, 1, 0, 0, 0)
+      ); // One day later
+      view.timeExtent = {
+        start: startDate,
+        end: endDate,
+      };
+    });
 
     //
     //  EVENTS
