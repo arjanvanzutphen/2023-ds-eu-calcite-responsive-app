@@ -19,6 +19,7 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 let map;
 let view;
+let layer;
 let valuePickerTime;
 
 /* Loading a mapView (2d) */
@@ -70,6 +71,140 @@ map
     view.map = map;
     view.popupEnabled = false;
     await view?.map?.portalItem?.portal.load();
+    /* 3D hacks */
+    layer = view.map.findLayerById("18b7125189a-layer-70");
+    layer.renderer = {
+      type: "simple",
+      symbol: {
+        type: "polygon-3d",
+        symbolLayers: [{
+          type: "fill",
+          pattern: {
+            type: "style",
+            style: "solid"
+          },
+          material: { color: [255, 255, 255, 1] },
+          outline: { color: [70, 70, 70, 0.7], size: 0 }
+        }]
+      },
+      visualVariables: [{
+        type: "color",
+        valueExpression: "$feature.a1 - $feature.a4",
+        legendOptions: {
+          title: "Net change in population"
+        },
+        stops: [
+          {
+            value: -1000, color: [123, 50, 148, 1]
+          },
+          {
+            value: -500, color: [194, 165, 207, 1]
+          },
+          { value: 0, color: [247, 247, 247, 1] },
+          {
+            value: 1767, color: [166, 219, 160, 1]
+          },
+          {
+            value: 3534, color: [0, 136, 55, 1]
+          },
+        ]
+      }]
+    }
+    // add a second layer with point symbols
+    const barsLayer = layer.clone();
+    barsLayer.renderer = {
+      type: "simple",
+      symbol: {
+        type: "point-3d",
+        symbolLayers: [{
+          type: "object",
+          resource: { primitive: "cube" },
+          material: { color: [0, 0, 0, 1] },
+          anchor: "bottom",
+          depth: 5000,
+          height: 10000,
+          width: 5000
+        }]
+      },
+      visualVariables: [{
+        type: "color",
+        valueExpression: "$feature.a1 - $feature.a4",
+        legendOptions: {
+          title: "Net change in population"
+        },
+        stops: [
+          {
+            value: -1000, color: [123, 50, 148, 1]
+          },
+          {
+            value: -500, color: [194, 165, 207, 1]
+          },
+          { value: 0, color: [247, 247, 247, 1] },
+          {
+            value: 1767, color: [166, 219, 160, 1]
+          },
+          {
+            value: 3534, color: [0, 136, 55, 1]
+          },
+        ]
+      }, {
+        type: "size",
+        valueExpression: "$feature.a1 - $feature.a4",
+        axis: "height",
+        legendOptions: {
+          title: "Net change in population"
+        },
+        stops: [
+          {
+            value: -1000, size: 40000,
+          },
+          {
+            value: -500, size: 20000
+          },
+          { value: 0, size: 10000 },
+          {
+            value: 1767, size: 20000
+          },
+          {
+            value: 3534, size: 40000
+          },
+        ]
+      },
+      // {
+      //   type: "size",
+      //   axis: "height",
+      //   useSymbolValue: true,
+      // },
+      {
+        type: "size",
+        valueExpression: "$feature.a1 - $feature.a4",
+        axis: "width-and-depth",
+        //useSymbolValue: true,
+        stops: [
+          {
+            value: -1000, size: 15000,
+          },
+          {
+            value: -500, size: 7500
+          },
+          { value: 0, size: 2500 },
+          {
+            value: 1767, size: 7500
+          },
+          {
+            value: 3534, size: 15000
+          },
+        ]
+      }
+      ]
+
+    }
+    view.map.add(barsLayer);
+    // here you could save the webscene
+    // view.map.updateFrom(view).then(function () {
+    //   view.map.save();
+    // });
+
     /* Item title */
     document.title = view?.map?.portalItem?.title;
     document.querySelector("calcite-navigation-logo").heading =
@@ -137,7 +272,50 @@ map
       },
     });
 
+    const currentYear = "2013";
+
     // Add the widget to the bottom-right corner of the view
+
+    const valuePickerTime = new ValuePicker({
+      //container: "container-value-picker-widget",
+      component: {
+        type: "label",
+        items: [
+          { value: "2013", label: "2013" },
+          { value: "2014", label: "2014" },
+          { value: "2015", label: "2015" },
+          { value: "2016", label: "2016" },
+          { value: "2017", label: "2017" },
+          { value: "2018", label: "2018" },
+          { value: "2019", label: "2019" },
+          { value: "2020", label: "2020" },
+          { value: "2021", label: "2021" },
+        ],
+      },
+      caption: "Year",
+      playRate: 600,
+      visibleElements: {
+        nextButton: true,
+        playButton: true,
+        previousButton: true,
+      },
+      values: [currentYear], // "current value"
+    });
+
+    view.ui.add(valuePickerTime, "top-left");
+
+    const setCurrentTime = (value) => {
+      const startDate = new Date(
+        Date.UTC(Number.parseInt(value), 11, 30, 0, 0, 0)
+      ); // One day before
+      const endDate = new Date(
+        Date.UTC(Number.parseInt(value) + 1, 0, 1, 0, 0, 0)
+      ); // One day later
+      view.timeExtent = {
+        start: startDate,
+        end: endDate,
+      };
+=======
     if (Array.from(urlParams.keys()).includes("webmap_id")) {
       valuePickerTime = new ValuePicker({
         //container: "container-value-picker-widget",
@@ -187,6 +365,15 @@ map
         };
       });
     }
+
+    // watch the values change on the value picker update the
+    // view.timeExtent show to the land cover for the given year
+    valuePickerTime.watch("values", (values) => {
+      //console.log(values);
+      setCurrentTime(values[0])
+    });
+
+    setCurrentTime(currentYear);
 
     //
     //  EVENTS
