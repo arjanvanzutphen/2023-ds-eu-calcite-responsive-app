@@ -1,6 +1,6 @@
 // @arcgis/core
-import WebMap from "https://js.arcgis.com/4.28/@arcgis/core//WebMap.js";
-import WebScene from "https://js.arcgis.com/4.28/@arcgis/core//WebScene.js";
+import WebMap from "https://js.arcgis.com/4.28/@arcgis/core/WebMap.js";
+import WebScene from "https://js.arcgis.com/4.28/@arcgis/core/WebScene.js";
 import MapView from "https://js.arcgis.com/4.28/@arcgis/core/views/MapView.js";
 import SceneView from "https://js.arcgis.com/4.28/@arcgis/core/views/SceneView.js";
 import FeatureEffect from "https://js.arcgis.com/4.28/@arcgis/core/layers/support/FeatureEffect.js";
@@ -19,6 +19,7 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 let map;
 let view;
+let valuePickerTime;
 
 /* Loading a mapView (2d) */
 if (Array.from(urlParams.keys()).includes("webmap_id")) {
@@ -138,7 +139,7 @@ map
 
     // Add the widget to the bottom-right corner of the view
     if (Array.from(urlParams.keys()).includes("webmap_id")) {
-      const valuePickerTime = new ValuePicker({
+      valuePickerTime = new ValuePicker({
         //container: "container-value-picker-widget",
         component: {
           type: "label",
@@ -164,12 +165,16 @@ map
         values: ["2013"], // "current value"
       });
 
-      view.ui.add(valuePickerTime, "top-left");
+      if (window.innerWidth < view.breakpoints.small) {
+        view.ui.add(valuePickerTime, "manual");
+        valuePickerTime.container = "container-value-picker-widget";
+      } else {
+        view.ui.add(valuePickerTime, "top-left");
+      }
 
       // watch the values change on the value picker update the
       // view.timeExtent show to the land cover for the given year
       valuePickerTime.watch("values", (values) => {
-        //console.log(values);
         const startDate = new Date(
           Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
         ); // One day before
@@ -213,14 +218,10 @@ map
           featuresWidget.features = undefined;
           featuresWidget.close();
         }
-
-        //console.log(featuresWidget);
-        //debugger;
       }
     );
 
     // Use reactiveUtils to watch the Features widget features property
-
     reactiveUtils.watch(
       () => featuresWidget.features,
       (features) => {
@@ -229,6 +230,15 @@ map
           features.length === 0 ? "" : "none";
       }
     );
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth < view.breakpoints.small) {
+        view.ui.move(valuePickerTime, "manual");
+        valuePickerTime.container = "container-value-picker-widget";
+      } else {
+        view.ui.move(valuePickerTime, "top-left");
+      }
+    });
 
     // Feature effect
     if (Array.from(urlParams.keys()).includes("webmap_id")) {
