@@ -1,6 +1,6 @@
 // @arcgis/core
-import WebMap from "https://js.arcgis.com/4.28/@arcgis/core//WebMap.js";
-import WebScene from "https://js.arcgis.com/4.28/@arcgis/core//WebScene.js";
+import WebMap from "https://js.arcgis.com/4.28/@arcgis/core/WebMap.js";
+import WebScene from "https://js.arcgis.com/4.28/@arcgis/core/WebScene.js";
 import MapView from "https://js.arcgis.com/4.28/@arcgis/core/views/MapView.js";
 import SceneView from "https://js.arcgis.com/4.28/@arcgis/core/views/SceneView.js";
 import FeatureEffect from "https://js.arcgis.com/4.28/@arcgis/core/layers/support/FeatureEffect.js";
@@ -20,6 +20,7 @@ const urlParams = new URLSearchParams(queryString);
 let map;
 let view;
 let layer;
+let valuePickerTime;
 
 /* Loading a mapView (2d) */
 if (Array.from(urlParams.keys()).includes("webmap_id")) {
@@ -274,6 +275,7 @@ map
     const currentYear = "2013";
 
     // Add the widget to the bottom-right corner of the view
+
     const valuePickerTime = new ValuePicker({
       //container: "container-value-picker-widget",
       component: {
@@ -313,6 +315,55 @@ map
         start: startDate,
         end: endDate,
       };
+=======
+    if (Array.from(urlParams.keys()).includes("webmap_id")) {
+      valuePickerTime = new ValuePicker({
+        //container: "container-value-picker-widget",
+        component: {
+          type: "label",
+          items: [
+            { value: "2013", label: "2013" },
+            { value: "2014", label: "2014" },
+            { value: "2015", label: "2015" },
+            { value: "2016", label: "2016" },
+            { value: "2017", label: "2017" },
+            { value: "2018", label: "2018" },
+            { value: "2019", label: "2019" },
+            { value: "2020", label: "2020" },
+            { value: "2021", label: "2021" },
+          ],
+        },
+        caption: "Year",
+        playRate: 600,
+        visibleElements: {
+          nextButton: true,
+          playButton: true,
+          previousButton: true,
+        },
+        values: ["2013"], // "current value"
+      });
+
+      if (window.innerWidth < view.breakpoints.small) {
+        view.ui.add(valuePickerTime, "manual");
+        valuePickerTime.container = "container-value-picker-widget";
+      } else {
+        view.ui.add(valuePickerTime, "top-left");
+      }
+
+      // watch the values change on the value picker update the
+      // view.timeExtent show to the land cover for the given year
+      valuePickerTime.watch("values", (values) => {
+        const startDate = new Date(
+          Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
+        ); // One day before
+        const endDate = new Date(
+          Date.UTC(Number.parseInt(values[0]) + 1, 0, 1, 0, 0, 0)
+        ); // One day later
+        view.timeExtent = {
+          start: startDate,
+          end: endDate,
+        };
+      });
     }
 
     // watch the values change on the value picker update the
@@ -354,14 +405,10 @@ map
           featuresWidget.features = undefined;
           featuresWidget.close();
         }
-
-        //console.log(featuresWidget);
-        //debugger;
       }
     );
 
     // Use reactiveUtils to watch the Features widget features property
-
     reactiveUtils.watch(
       () => featuresWidget.features,
       (features) => {
@@ -370,6 +417,15 @@ map
           features.length === 0 ? "" : "none";
       }
     );
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth < view.breakpoints.small) {
+        view.ui.move(valuePickerTime, "manual");
+        valuePickerTime.container = "container-value-picker-widget";
+      } else {
+        view.ui.move(valuePickerTime, "top-left");
+      }
+    });
 
     // Feature effect
     if (Array.from(urlParams.keys()).includes("webmap_id")) {
