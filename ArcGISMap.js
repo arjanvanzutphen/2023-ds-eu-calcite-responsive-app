@@ -9,6 +9,7 @@ import Features from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Features.j
 import * as reactiveUtils from "https://js.arcgis.com/4.28/@arcgis/core/core/reactiveUtils.js";
 import Expand from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Expand.js";
 import Legend from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Legend.js";
+import Home from "https://js.arcgis.com/4.28/@arcgis/core/widgets/Home.js";
 import ValuePicker from "https://js.arcgis.com/4.28/@arcgis/core/widgets/ValuePicker.js";
 
 /**
@@ -248,12 +249,16 @@ map
 
     //view.ui.move("zoom", "bottom-right");
     view.ui.components = ["attribution"];
+    const homeWidget = new Home({
+      view: view,
+    });
     const legendWidget = new Legend({
       view: view,
     });
     const expandLegendWidget = new Expand({
       content: legendWidget,
     });
+    view.ui.add(homeWidget, "bottom-right");
     view.ui.add(expandLegendWidget, "bottom-right");
     renderDropdownLayers(view.map.layers);
     // Setting the title of the app
@@ -319,7 +324,7 @@ map
         ],
       },
       caption: "Year",
-      playRate: 600,
+      playRate: 400,
       visibleElements: {
         nextButton: true,
         playButton: true,
@@ -402,6 +407,13 @@ map
 
     setCurrentTime(currentYear);
 
+    if (window.innerWidth < view.breakpoints.small) {
+      view.ui.move(valuePickerTime, "manual");
+      valuePickerTime.container = "container-value-picker-widget";
+    } else {
+      view.ui.move(valuePickerTime, "top-left");
+    }
+
     //
     //  EVENTS
     //
@@ -455,40 +467,36 @@ map
     });
 
     // Feature effect
-    if (Array.from(urlParams.keys()).includes("webmap_id")) {
-      reactiveUtils.watch(
-        () => featuresWidget.selectedFeature,
-        (selectedFeature) => {
-          // Typical usage
-          if (selectedFeature) {
-            const effect = new FeatureEffect({
-              filter: new FeatureFilter({
-                where: `${selectedFeature.layer.objectIdField} = ${
-                  selectedFeature.attributes[
-                    selectedFeature.layer.objectIdField
-                  ]
-                }`,
-              }),
-              includedEffect: "drop-shadow(3px, 3px, 3px, black)",
-              excludedEffect: "grayscale(40%) opacity(30%)",
-            });
-            selectedFeature.layer.highlightOptions = undefined;
-            selectedFeature.layer.featureEffect = effect;
-            // Hide the item details
-            document.querySelector(
-              "calcite-block#block-item-details"
-            ).style.display = "none";
-          } else {
-            view.map.allLayers.map((layer) => {
-              layer.featureEffect = undefined;
-            });
-            document.querySelector(
-              "calcite-block#block-item-details"
-            ).style.display = "";
-          }
+    reactiveUtils.watch(
+      () => featuresWidget.selectedFeature,
+      (selectedFeature) => {
+        // Typical usage
+        if (selectedFeature) {
+          const effect = new FeatureEffect({
+            filter: new FeatureFilter({
+              where: `${selectedFeature.layer.objectIdField} = ${
+                selectedFeature.attributes[selectedFeature.layer.objectIdField]
+              }`,
+            }),
+            includedEffect: "drop-shadow(3px, 3px, 3px, black)",
+            excludedEffect: "grayscale(40%) opacity(30%)",
+          });
+          selectedFeature.layer.highlightOptions = undefined;
+          selectedFeature.layer.featureEffect = effect;
+          // Hide the item details
+          document.querySelector(
+            "calcite-block#block-item-details"
+          ).style.display = "none";
+        } else {
+          view.map.allLayers.map((layer) => {
+            layer.featureEffect = undefined;
+          });
+          document.querySelector(
+            "calcite-block#block-item-details"
+          ).style.display = "";
         }
-      );
-    }
+      }
+    );
 
     /**
      * On change select dropdown layers / metric
