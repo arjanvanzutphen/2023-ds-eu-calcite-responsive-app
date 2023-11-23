@@ -23,7 +23,9 @@ let view;
 let layer;
 let valuePickerTime;
 
-/* Loading a mapView (2d) */
+/*
+ * Loading a mapView (2d)
+ */
 if (Array.from(urlParams.keys()).includes("webmap_id")) {
   const itemId = urlParams.get("webmap_id");
   map = new WebMap({
@@ -39,8 +41,10 @@ if (Array.from(urlParams.keys()).includes("webmap_id")) {
       fillOpacity: 0.2,
     },
   });
+  /*
+   * Loading a sceneView (3d)
+   */
 } else if (Array.from(urlParams.keys()).includes("webscene_id")) {
-  /* Loading a sceneView (3d) */
   const itemId = urlParams.get("webscene_id");
   map = new WebScene({
     portalItem: {
@@ -348,56 +352,6 @@ map
       };
     };
 
-    // if (Array.from(urlParams.keys()).includes("webmap_id")) {
-    //   valuePickerTime = new ValuePicker({
-    //     //container: "container-value-picker-widget",
-    //     component: {
-    //       type: "label",
-    //       items: [
-    //         { value: "2013", label: "2013" },
-    //         { value: "2014", label: "2014" },
-    //         { value: "2015", label: "2015" },
-    //         { value: "2016", label: "2016" },
-    //         { value: "2017", label: "2017" },
-    //         { value: "2018", label: "2018" },
-    //         { value: "2019", label: "2019" },
-    //         { value: "2020", label: "2020" },
-    //         { value: "2021", label: "2021" },
-    //       ],
-    //     },
-    //     caption: "Year",
-    //     playRate: 600,
-    //     visibleElements: {
-    //       nextButton: true,
-    //       playButton: true,
-    //       previousButton: true,
-    //     },
-    //     values: ["2013"], // "current value"
-    //   });
-
-    //   if (window.innerWidth < view.breakpoints.small) {
-    //     view.ui.add(valuePickerTime, "manual");
-    //     valuePickerTime.container = "container-value-picker-widget";
-    //   } else {
-    //     view.ui.add(valuePickerTime, "top-left");
-    //   }
-
-    //   // watch the values change on the value picker update the
-    //   // view.timeExtent show to the land cover for the given year
-    //   valuePickerTime.watch("values", (values) => {
-    //     const startDate = new Date(
-    //       Date.UTC(Number.parseInt(values[0]), 11, 30, 0, 0, 0)
-    //     ); // One day before
-    //     const endDate = new Date(
-    //       Date.UTC(Number.parseInt(values[0]) + 1, 0, 1, 0, 0, 0)
-    //     ); // One day later
-    //     view.timeExtent = {
-    //       start: startDate,
-    //       end: endDate,
-    //     };
-    //   });
-    // }
-
     // watch the values change on the value picker update the
     // view.timeExtent show to the land cover for the given year
     valuePickerTime.watch("values", (values) => {
@@ -447,7 +401,9 @@ map
       }
     );
 
+    //
     // Use reactiveUtils to watch the Features widget features property
+    //
     reactiveUtils.watch(
       () => featuresWidget.features,
       (features) => {
@@ -457,7 +413,11 @@ map
       }
     );
 
+    //
+    // Resize
+    //
     window.addEventListener("resize", () => {
+      // Use the View breakpoint to change layout
       if (window.innerWidth < view.breakpoints.small) {
         view.ui.move(valuePickerTime, "manual");
         valuePickerTime.container = "container-value-picker-widget";
@@ -466,7 +426,9 @@ map
       }
     });
 
-    // Feature effect
+    //
+    // Apply Feature effect to the selected feature
+    //
     reactiveUtils.watch(
       () => featuresWidget.selectedFeature,
       (selectedFeature) => {
@@ -483,7 +445,9 @@ map
           });
           selectedFeature.layer.highlightOptions = undefined;
           selectedFeature.layer.featureEffect = effect;
+          //
           // Hide the item details
+          //
           document.querySelector(
             "calcite-block#block-item-details"
           ).style.display = "none";
@@ -497,19 +461,6 @@ map
         }
       }
     );
-
-    /**
-     * On change select dropdown layers / metric
-     */
-    // const dropdownLayers = document.querySelector(
-    //   "calcite-dropdown#dropdown-layers"
-    // );
-
-    // dropdownLayers.calciteDropdownSelect = (evt) => {
-    //   debugger;
-
-    //   //console.log("dropdownLayers: ", evt);
-    // };
   })
   .catch((error) => {
     console.error("Unable to load the map. Error: ", error);
@@ -624,6 +575,9 @@ const renderSlidesMobile = (slides, sceneView) => {
   containerMobile.append(...slideComponentsMobile);
 };
 
+//
+//  Render the dropdown layers with the visibility toggle
+//
 const renderDropdownLayers = (layers) => {
   const dropDownItemLayers = layers.items.map((layer) => {
     const dropdownItem = document.createElement("calcite-dropdown-item");
@@ -644,10 +598,6 @@ const renderDropdownLayers = (layers) => {
       layers.forEach((layer) => {
         layer.visible = layer.id === evt.currentTarget.id ? true : false;
       });
-      // const layer = layers.find((layer) => {
-      //   return layer.id === evt.currentTarget.id;
-      // });
-      // layer.visible = !layer.visible;
       document.querySelector("calcite-button#button-layers").innerHTML =
         layer.title;
     };
